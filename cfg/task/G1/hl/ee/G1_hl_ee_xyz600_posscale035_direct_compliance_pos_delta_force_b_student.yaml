@@ -1,0 +1,12 @@
+name: G1HLEEXYZ600POSCALE035DIRECTCOMPLIANCEPOSDELTAFORCEBSTUDENT
+
+defaults:
+  - /task/G1/hl/ee/G1_hl_ee_xyz600_compliance_pos_delta_force_b_student@_here_
+  - _self_
+
+action:
+  ee_command:
+    pos_scale: [0.35, 0.35, 0.35]
+
+command:
+  net_pull_ee_compliance_smoothing: false

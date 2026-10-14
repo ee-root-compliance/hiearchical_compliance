@@ -1,0 +1,26 @@
+# @package algo
+_target_: active_adaptation.learning.hierarchical.root_student_force_moe.RootStudentForceAnalyticalMoEPolicy
+name: root_student_force_analytical_moe
+
+# The fixed experts apply their own checkpoint VecNorm. Do not normalize
+# the shared observation or the analytical stiffness gate a second time.
+# Anchors and experts below are defaults; the cfg/moe/ manifest overrides them.
+vecnorm: null
+in_keys: [hl_policy, hl_moe]
+stiffness_key: hl_moe
+stiffness_anchors: [200.0, 400.0, 600.0]
+# Compose complete joint high-level actions through baseline-relative residuals.
+# This preserves the exact single-axis anchors, e.g. [200, 600, 600]
+# evaluates to the complete x_200 expert action.
+composition: axis_component # full_residual, axis_component
+action_limit: 0.999
+
+# Filled from the --moe_experts_config manifest.
+experts:
+  baseline_600: {checkpoint_path: null, require_student_checkpoint: true, require_vecnorm: true}
+  x_400: {checkpoint_path: null, require_student_checkpoint: true, require_vecnorm: true}
+  x_200: {checkpoint_path: null, require_student_checkpoint: true, require_vecnorm: true}
+  y_400: {checkpoint_path: null, require_student_checkpoint: true, require_vecnorm: true}
+  y_200: {checkpoint_path: null, require_student_checkpoint: true, require_vecnorm: true}
+  z_400: {checkpoint_path: null, require_student_checkpoint: true, require_vecnorm: true}
+  z_200: {checkpoint_path: null, require_student_checkpoint: true, require_vecnorm: true}

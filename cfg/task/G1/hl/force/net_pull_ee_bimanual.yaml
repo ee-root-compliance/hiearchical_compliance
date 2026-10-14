@@ -1,0 +1,7 @@
+# Bimanual training variant of net-pull EE disturbances.
+# The default net-pull behavior remains single-hand; this fragment opts the
+# new expert tasks into mixed single-hand and simultaneous-hand episodes.
+
+command:
+  # 60% single-hand episodes, 40% simultaneous left/right episodes.
+  net_pull_bimanual_prob: 0.4

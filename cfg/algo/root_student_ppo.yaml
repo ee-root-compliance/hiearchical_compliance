@@ -1,0 +1,25 @@
+# @package algo
+_target_: active_adaptation.learning.hierarchical.root_student_ppo.RootStudentPPOPolicy
+name: root_student_ppo
+
+phase: train
+train_every: 32
+ppo_epochs: 5
+num_minibatches: 8
+estimator_epochs: 2
+
+lr: 3.0e-4
+desired_kl: 0.01
+clip_param: 0.2
+entropy_coef_start: 0.005
+entropy_coef_end: 0.001
+init_noise_scale: 0.8
+load_noise_scale: null
+layer_norm: before
+latent_dim: 128
+reg_lambda: 0.2
+vecnorm: null
+
+in_keys: [hl_policy]
+priv_in_keys: [hl_priv]
+critic_in_keys: [hl_policy, hl_priv]

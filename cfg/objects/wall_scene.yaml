@@ -1,0 +1,17 @@
+# Wall obstacle scene
+# Usage: python scripts/eval_manipulation.py --run_path xxx -p --objects cfg/objects/wall_scene.yaml
+
+objects:
+  # Wall in front
+  - type: wall
+    name: wall_front
+    pos: [0.8, 0.0, 0.5]
+    size: [0.05, 1.5, 1.0]
+    color: [0.6, 0.6, 0.65]
+
+  # Side wall (left)
+  - type: wall
+    name: wall_left
+    pos: [0.4, 0.6, 0.5]
+    size: [0.8, 0.05, 1.0]
+    color: [0.65, 0.6, 0.6]

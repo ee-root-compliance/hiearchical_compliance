@@ -1,0 +1,7 @@
+# @package algo
+defaults:
+  - root_student_ppo
+  - _self_
+
+name: root_student_ppo_adapt
+phase: adapt

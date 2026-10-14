@@ -1,0 +1,15 @@
+name: G1HLEEBIMANUALANALYTICALMOE200600FORCEBSTUDENT
+
+defaults:
+  - /task/G1/hl/ee/G1_hl_ee_xyz_analytical_moe_200_600_force_b_student@_here_
+  - _self_
+
+command:
+  # The command manager keeps independent [left xyz, right xyz] stiffness.
+  # The seven frozen experts are still the existing shared-hand experts.
+  net_pull_ee_compliance_stiffness_per_ee: true
+
+observation:
+  hl_moe:
+    # Six normalized values: [left kx, ky, kz, right kx, ky, kz].
+    net_pull_ee_compliance_stiffness_command: {}

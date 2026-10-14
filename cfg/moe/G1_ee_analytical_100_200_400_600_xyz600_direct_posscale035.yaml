@@ -1,0 +1,71 @@
+# Analytical xyz MoE over anchors 100/200/400/600 N/m (ten experts).
+#
+# Each expert and low_policy takes one of:
+#   checkpoint_path: /path/to/checkpoint.pt
+#   checkpoint_path: run:entity/project/run_id[:iteration]
+#   run_path: entity/project/run_id
+
+task: G1/hl/ee/G1_hl_ee_xyz_analytical_moe_100_200_400_600_force_b_student
+
+# Frozen low-level policy; overridden by --low-checkpoint / --low-run-path.
+low_policy:
+  checkpoint_path: null
+  run_path: null
+
+stiffness_anchors: [100.0, 200.0, 400.0, 600.0]
+composition: axis_component
+action_limit: 0.999
+allow_extrapolation: false
+
+compose_in_physical_space: true
+output_pos_scale: [0.35, 0.35, 0.35]
+expert_pos_scales:
+  baseline_600: [0.35, 0.35, 0.35]
+  x_400: [0.15, 0.15, 0.15]
+  x_200: [0.15, 0.15, 0.15]
+  x_100: [0.35, 0.15, 0.15]
+  y_400: [0.15, 0.15, 0.15]
+  y_200: [0.15, 0.15, 0.15]
+  y_100: [0.15, 0.35, 0.15]
+  z_400: [0.15, 0.15, 0.15]
+  z_200: [0.15, 0.15, 0.15]
+  z_100: [0.15, 0.15, 0.35]
+
+expert_names:
+  - baseline_600
+  - x_400
+  - x_200
+  - x_100
+  - y_400
+  - y_200
+  - y_100
+  - z_400
+  - z_200
+  - z_100
+baseline_expert_name: baseline_600
+axis_expert_names:
+  x: [x_400, x_200, x_100]
+  y: [y_400, y_200, y_100]
+  z: [z_400, z_200, z_100]
+
+experts:
+  baseline_600:
+    checkpoint_path: null
+  x_400:
+    checkpoint_path: null
+  x_200:
+    checkpoint_path: null
+  x_100:
+    checkpoint_path: null
+  y_400:
+    checkpoint_path: null
+  y_200:
+    checkpoint_path: null
+  y_100:
+    checkpoint_path: null
+  z_400:
+    checkpoint_path: null
+  z_200:
+    checkpoint_path: null
+  z_100:
+    checkpoint_path: null

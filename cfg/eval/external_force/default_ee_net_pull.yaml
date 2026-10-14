@@ -1,0 +1,10 @@
+command:
+  external_force_mode: net_pull
+  net_pull_apply_pattern:
+    - ".*hand_mimic"
+  net_pull_force_range: [5.0, 30.0]
+  net_pull_ramp_up_range: [25, 75]
+  net_pull_hold_range: [100, 250]
+  net_pull_ramp_down_range: [25, 75]
+  net_pull_rest_range: [50, 150]
+  net_pull_xy_only: true

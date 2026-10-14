@@ -1,0 +1,21 @@
+# Manipulation task inference configuration
+defaults:
+  - eval
+  - _self_
+
+# Task configuration
+task: G1/G1_manipulation
+
+# Model checkpoint directory
+checkpoint_dir: "outputs"
+
+# Whether to use VecNorm (observation normalization)
+vecnorm: "eval"
+
+# Runtime parameters
+num_envs: 1
+headless: false
+
+# Visualization parameters
+enable_viewer: true
+debug_mode: false

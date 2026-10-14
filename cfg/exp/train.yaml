@@ -1,0 +1,10 @@
+# @package _global_
+
+defaults:
+  - override /algo: ppo_train
+
+task:
+  command:
+    student_train: False
+  reward:
+    _student_train_: False

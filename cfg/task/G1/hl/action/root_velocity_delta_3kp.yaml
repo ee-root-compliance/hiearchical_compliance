@@ -1,0 +1,9 @@
+defaults:
+  - /task/G1/hl/action/root_3kp@_here_
+  - _self_
+
+action:
+  command_dim: 2
+  root_command:
+    enabled: true
+    mode: velocity_delta

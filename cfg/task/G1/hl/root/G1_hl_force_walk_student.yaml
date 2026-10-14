@@ -1,0 +1,14 @@
+name: G1HLFORCEWALKSTUDENT
+
+defaults:
+  - /task/G1/hl/base_student@_here_
+  - /task/G1/hl/action/root_velocity_delta_3kp@_here_
+  - /task/G1/hl/force/net_pull@_here_
+  - /task/G1/hl/task/force_walk@_here_
+  - _self_
+
+observation:
+  hl_force_priv:
+    net_pull_force_priv: {}
+  hl_priv:
+    net_pull_force_priv: {enabled: false}

@@ -1,0 +1,21 @@
+name: G1HLEECOMPLIANCEPOSDELTASTUDENT
+
+defaults:
+  - /task/G1/hl/base_student@_here_
+  - /task/G1/hl/action/ee_pos_delta_3kp@_here_
+  - /task/G1/hl/force/net_pull_ee@_here_
+  - /task/G1/hl/task/ee_compliance@_here_
+  - _self_
+
+observation:
+  hl_policy:
+    ee_compliance_state: {enabled: false}
+  hl_force_priv:
+    net_pull_force_priv: {}
+  hl_priv:
+    net_pull_force_priv: {enabled: false}
+    ee_compliance_state:
+      enabled: false
+      stiffness: ${task.reward.ee_compliance.ee_force_compliance_tracking.stiffness}
+      max_offset: ${task.reward.ee_compliance.ee_force_compliance_tracking.max_offset}
+      force_deadband: ${task.reward.ee_compliance.ee_force_compliance_tracking.force_deadband}

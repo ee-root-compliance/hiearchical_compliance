@@ -1,0 +1,12 @@
+name: G1HLEECOMPLIANCEPOSDELTAFORCEBSTUDENT
+
+defaults:
+  - /task/G1/hl/ee/G1_hl_ee_compliance_pos_delta_student@_here_
+  - _self_
+
+observation:
+  hl_force_priv:
+    # Preserve the legacy observation for old tasks/checkpoints, but use only
+    # the deploy-relevant per-hand root-frame force for this task family.
+    net_pull_force_priv: {enabled: false}
+    net_pull_ee_force_b_priv: {}

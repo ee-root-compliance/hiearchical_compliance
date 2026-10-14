@@ -1,0 +1,26 @@
+name: G13KPSTIFF
+
+defaults:
+  # Non-compliant low-level policy with the same observation/reward structure as 3kp.
+  - /task/G1/G1_3kp@_here_
+  - _self_
+
+command:
+  # Keep external perturbations, but disable admittance/compliance target shifting.
+  compliance: False
+  max_force: 30.0
+  net_force_limit: 30.0
+  force_safe_bounds: [30.0, 30.0]
+  force_safe_default: 30.0
+  dataset:
+    mem_paths:
+      - limmt_no_foot_compliance_full
+    path_weights:
+      - 1.0
+
+reward:
+  impedance:
+    # These compare actual force against a compliance-generated expected force.
+    # In non-compliant mode, force targets come from motion reference instead.
+    force_reward: {enabled: false}
+    force_exd_penalty: {enabled: false}

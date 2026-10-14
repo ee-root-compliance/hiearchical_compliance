@@ -1,0 +1,13 @@
+name: G1HLEEXYZ600COMPLIANCEPOSDELTAFORCEBSTUDENT
+
+defaults:
+  - /task/G1/hl/ee/G1_hl_ee_compliance_pos_delta_force_b_student@_here_
+  - _self_
+
+reward:
+  ee_compliance:
+    ee_force_compliance_tracking:
+      stiffness: [600.0, 600.0, 600.0]
+      max_offset: [0.25, 0.25, 0.25]
+    ee_force_limit_penalty:
+      force_limit: [15.0, 15.0, 15.0]

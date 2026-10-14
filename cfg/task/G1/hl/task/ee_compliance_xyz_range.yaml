@@ -1,0 +1,12 @@
+# Independent xyz stiffness range for high-level EE compliance.
+# Each environment samples kx, ky, and kz independently on reset.
+
+command:
+  net_pull_ee_compliance_stiffness_xyz_range:
+    - [200.0, 200.0, 200.0]
+    - [600.0, 600.0, 600.0]
+
+observation:
+  hl_policy:
+    # Three normalized values: [kx, ky, kz] -> [-1, 1]^3.
+    net_pull_ee_compliance_stiffness_command: {}

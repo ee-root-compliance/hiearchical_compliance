@@ -1,0 +1,14 @@
+defaults:
+  - /task/G1/hl/action/root_3kp@_here_
+  - _self_
+
+action:
+  command_dim: 6
+  root_command:
+    enabled: false
+  ee_command:
+    enabled: true
+    mode: pos_delta
+    # This is the maximum xyz offset after tanh. With a 30 N max pull and
+    # 200 N/m compliance stiffness, F/k is about 0.15 m.
+    pos_scale: [0.15, 0.15, 0.15]

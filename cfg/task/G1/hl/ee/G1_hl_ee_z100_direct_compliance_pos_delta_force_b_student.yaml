@@ -1,0 +1,10 @@
+name: G1HLEEZ100DIRECTCOMPLIANCEPOSDELTAFORCEBSTUDENT
+
+defaults:
+  - /task/G1/hl/ee/G1_hl_ee_z100_compliance_pos_delta_force_b_student@_here_
+  - _self_
+
+command:
+  # Use the analytical instantaneous target offset=F/K, without virtual
+  # admittance smoothing. Keep the z100 margin-aware disturbance sampling.
+  net_pull_ee_compliance_smoothing: false

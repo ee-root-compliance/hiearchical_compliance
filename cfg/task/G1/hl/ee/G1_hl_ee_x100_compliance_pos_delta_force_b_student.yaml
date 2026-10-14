@@ -1,0 +1,19 @@
+name: G1HLEEX100COMPLIANCEPOSDELTAFORCEBSTUDENT
+
+defaults:
+  - /task/G1/hl/ee/G1_hl_ee_compliance_pos_delta_force_b_student@_here_
+  - _self_
+
+action:
+  ee_command:
+    # 30 N / 100 N/m = 0.30 m. Leave margin so the largest training probe
+    # does not saturate the position command or the compliance target.
+    pos_scale: [0.35, 0.15, 0.15]
+
+reward:
+  ee_compliance:
+    ee_force_compliance_tracking:
+      stiffness: [100.0, 600.0, 600.0]
+      max_offset: [0.35, 0.05, 0.05]
+    ee_force_limit_penalty:
+      force_limit: [15.0, 30.0, 30.0]

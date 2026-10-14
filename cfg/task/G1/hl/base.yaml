@@ -1,0 +1,116 @@
+defaults:
+  - /task/G1/G1_base@_here_
+  - _self_
+
+command:
+  _target_: active_adaptation.envs.mdp.commands.motion_tracking.RootCommandMotionTrackingCommand_impedance
+  nominal_root_height: 0.79
+  student_train: True
+  disable_motion_finish: True
+  max_force: 200.0
+  net_force_limit: 200.0
+  net_torque_limit: 35.0
+
+action:
+  _target_: active_adaptation.envs.mdp.action.HierarchicalRootCommand
+  _recursive_: False
+  nominal_root_height: 0.79
+  low_policy:
+    checkpoint_path: null
+    run_path: null
+    checkpoint_iteration: null
+    phase: adapt
+    vecnorm: eval
+    in_keys: [policy, priv, joint_target, priv_critic]
+  low_action:
+    _target_: active_adaptation.envs.mdp.action.JointPosition
+    action_scaling:
+      .*elbow_joint: 1.0
+      .*shoulder.*: 1.0
+      .*wrist.*: 1.0
+      .*hip_roll.*: 0.25
+      .*hip_yaw.*: 0.25
+      .*hip_pitch.*: 0.5
+      .*knee.*: 0.5
+      .*waist.*: 0.25
+      .*ankle.*: 0.5
+    max_delay: 4
+    alpha: [0.9, 0.9]
+    alpha_wide: [0.8, 1.0]
+    alpha_jit_scale: 0.025
+    boot_protect: True
+
+observation:
+  hl_policy:
+    boot_indicator_state: {}
+    command: {}
+    net_pull_force_priv: {}
+    # Privileged end-to-end high-level policy sees current robot/support state.
+    # Motion target observations stay out unless a task adds them explicitly.
+    body_height:      {body_names: ["pelvis", "torso_link", ".*ankle_roll_link"]}
+    contact_forces:   {body_names: .*ankle_roll_link}
+    root_linvel_b:    {ema: 0.2}
+    root_ang_vel_history:      {history_steps: [0, 1, 2, 3, 4, 5, 6, 7, 8], noise_std: 0.0}
+    projected_gravity_history: {history_steps: [0, 1, 2, 3, 4, 5, 6, 7, 8], noise_std: 0.0}
+    joint_pos_history:         {history_steps: [0, 1, 2, 3, 4, 5, 6, 7, 8], noise_std: 0.0}
+    current_keypoint_b: {}
+    current_keypoint_vel_b: {}
+    applied_action:   {}
+    applied_torque:   {}
+    root_and_wrist_6d: {}
+    feet_pos_b: {}
+    prev_actions:              {steps: 3}
+
+  policy:
+    boot_indicator_state: {}
+    command: {}
+    root_and_wrist_6d: {}
+    root_ang_vel_history:      {history_steps: [0], noise_std: 0.05}
+    projected_gravity_history: {history_steps: [0], noise_std: 0.01}
+    joint_pos_history:         {history_steps: [0, 1, 2, 3, 4], noise_std: 0.005}
+    prev_actions:              {steps: 3}
+
+  low_policy:
+    boot_indicator_state: {}
+    command: {}
+    root_and_wrist_6d: {}
+    root_ang_vel_history:      {history_steps: [0], noise_std: 0.05}
+    projected_gravity_history: {history_steps: [0], noise_std: 0.01}
+    joint_pos_history:         {history_steps: [0, 1, 2, 3, 4], noise_std: 0.005}
+    prev_actions:              {steps: 3}
+
+reward:
+  impedance:
+    force_reward: {weight: 0.0, enabled: false}
+    force_exd_penalty: {weight: 0.0, enabled: false}
+    force_target_tracking: {weight: 0.0, enabled: false}
+    force_target_vel_tracking: {weight: 0.0, enabled: false}
+    keypoint_tracking_imp: {weight: 0.0, enabled: false}
+    lower_keypoint_tracking: {weight: 0.0, enabled: false}
+  tracking:
+    root_pos_tracking: {weight: 0.0, enabled: false}
+    root_rot_tracking: {weight: 0.0, enabled: false}
+    root_vel_tracking: {weight: 0.0, enabled: false}
+    root_ang_vel_tracking: {weight: 0.0, enabled: false}
+    joint_pos_tracking: {weight: 0.0, enabled: false}
+    joint_vel_tracking: {weight: 0.0, enabled: false}
+    ee_tracking: {weight: 0.0, enabled: false}
+    feet_tracking: {weight: 0.0, enabled: false}
+  loco:
+    survival:           {weight: 5.0, enabled: true}
+    impact_force_l2:    {weight: 4.0, enabled: true, body_names: .*ankle_roll_link}
+    feet_slip:          {weight: 2.0, enabled: true, body_names: .*ankle_roll_link}
+    joint_vel_l2:       {weight: 5.0e-4, enabled: true, joint_names: .*}
+    action_rate_l2:     {weight: 0.2, enabled: true}
+    feet_air_time_ref:  {weight: 0.0, enabled: false, body_names: [left_ankle_roll_link, right_ankle_roll_link], thres: 0.8}
+    joint_pos_limits:   {weight: 1.0, joint_names: ".*", soft_factor: 0.9, enabled: true}
+    feet_contact_count: {weight: 0.0, enabled: false, body_names: .*ankle_roll_link}
+  regularization:
+    high_action_l2: {weight: 0.02}
+    high_action_rate_l2: {weight: 0.20}
+    high_action_rate2_l2: {weight: 0.10}
+
+termination:
+  cum_error: {enabled: false}
+  fall_over: {xy_thres: 0.8, z_thres: 0.5}
+  root_height_below: {min_height: 0.55}

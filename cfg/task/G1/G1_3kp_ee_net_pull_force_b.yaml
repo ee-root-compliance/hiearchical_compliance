@@ -1,0 +1,42 @@
+name: G13KPEENETPULLFORCEB
+
+defaults:
+  - /task/G1/G1_3kp@_here_
+  - _self_
+
+command:
+  # Match the high-level EE compliance force generator: one net force,
+  # applied only to the two hand bodies, with full XYZ directions.
+  external_force_mode: net_pull
+  # Align legacy impedance reward slots with the actual EE-only force.
+  force_apply_pattern:
+    - ".*hand_mimic"
+  net_pull_apply_pattern:
+    - ".*hand_mimic"
+  net_pull_force_range: [5.0, 30.0]
+  net_pull_zero_prob: 0.4
+  net_pull_curriculum: false
+  net_pull_curriculum_end: 0.6
+  net_pull_zero_prob_start: 0.85
+  net_pull_force_scale_start: 0.25
+  net_pull_ramp_up_range: [25, 100]
+  net_pull_hold_range: [20, 200]
+  net_pull_ramp_down_range: [25, 100]
+  net_pull_rest_range: [20, 200]
+  net_pull_xy_only: false
+
+  # Use the same EE compliance target model as the current high-level
+  # 200-N/m baseline. This is task-local and does not change old tasks.
+  net_pull_ee_compliance_stiffness: 200.0
+  net_pull_ee_compliance_max_offset: 0.25
+  net_pull_ee_compliance_force_deadband: 0.0
+  use_net_pull_ee_target_for_tracking: true
+  sync_net_pull_ee_reward_targets: true
+
+observation:
+  priv:
+    # Keep the old key for config compatibility, but do not expose the
+    # legacy force/keypoint representation in this baseline.
+    force_priv: {enabled: false}
+    # Deploy-relevant per-hand force in the root/body frame: 6 dimensions.
+    net_pull_ee_force_b_priv: {}

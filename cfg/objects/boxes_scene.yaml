@@ -1,0 +1,30 @@
+# Multiple boxes scene for pushing/stacking
+# Usage: python scripts/eval_manipulation.py --run_path xxx -p --objects cfg/objects/boxes_scene.yaml
+
+objects:
+  # Larger static platform (height 0.8m)
+  - type: box_static
+    name: platform
+    pos: [0.7, 0.0, 0.4]
+    size: [0.3, 0.4, 0.8]
+    color: [0.4, 0.4, 0.4]
+    friction: 1.0
+
+
+  # # One larger dynamic box on top of the platform (easy to pick up)
+  # - type: box_dynamic
+  #   name: big_box
+  #   pos: [0.7, 0.0, 0.88]
+  #   size: [0.16, 0.16, 0.16]
+  #   color: [0.2, 0.6, 0.9]
+  #   mass: 0.2
+  #   friction: 1.0
+
+  # One larger dynamic cylinder on top of the platform (easy to pick up)
+  - type: cylinder_dynamic
+    name: big_cylinder
+    pos: [0.7, 0.0, 0.96]
+    radius: 0.18
+    height: 0.32
+    color: [0.2, 0.6, 0.9]
+    mass: 0.5

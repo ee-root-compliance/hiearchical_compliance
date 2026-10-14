@@ -1,0 +1,8 @@
+name: G1HLFORCERESISTEE
+
+defaults:
+  - /task/G1/hl/base@_here_
+  - /task/G1/hl/action/root_ee_3kp@_here_
+  - /task/G1/hl/force/net_pull@_here_
+  - /task/G1/hl/task/force_resist@_here_
+  - _self_

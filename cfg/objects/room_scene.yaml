@@ -1,0 +1,26 @@
+# Room scene with a table, a dynamic cylinder, and a bed for manipulation
+# Usage: python scripts/eval_manipulation.py --run_path xxx -p --objects cfg/objects/room_scene.yaml
+
+objects:
+  # Larger static platform (height 0.8m)
+  - type: box_static
+    name: table
+    pos: [1.0, 0.0, 0.4]
+    size: [0.3, 0.4, 0.8]
+    color: [0.4, 0.4, 0.4]
+    friction: 1.0
+
+  # One larger dynamic cylinder on top of the platform (easy to pick up)
+  - type: cylinder_dynamic
+    name: big_cylinder
+    pos: [1.0, 0.0, 0.96]
+    radius: 0.18
+    height: 0.32
+    color: [0.2, 0.6, 0.9]
+    mass: 0.1
+
+  - type: box_static
+    name: bed
+    pos: [-2.0, 0.0, 0.4]
+    size: [1.2, 2.0, 0.5]
+    color: [0.4, 0.4, 0.4]

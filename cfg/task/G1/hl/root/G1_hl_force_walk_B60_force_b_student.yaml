@@ -1,0 +1,10 @@
+name: G1HLFORCEWALKB60FORCEBSTUDENT
+
+defaults:
+  - /task/G1/hl/root/G1_hl_force_walk_force_b_student@_here_
+  - _self_
+
+reward:
+  root_hold:
+    root_force_velocity_tracking:
+      damping: 60.0

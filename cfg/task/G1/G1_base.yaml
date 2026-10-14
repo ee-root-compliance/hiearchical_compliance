@@ -1,0 +1,183 @@
+name: G1BASE
+
+defaults:
+  # see https://hydra.cc/docs/advanced/overriding_packages/
+  - /task/G1/G1
+  - _self_
+
+robot: 
+  name: g1_col_full
+
+action:
+  _target_: active_adaptation.envs.mdp.action.JointPosition
+  action_scaling: 
+    .*elbow_joint: 1.0
+    .*shoulder.*: 1.0
+    .*wrist.*: 1.0
+    .*hip_roll.*: 0.25
+    .*hip_yaw.*: 0.25
+    .*hip_pitch.*: 0.5
+    .*knee.*: 0.5
+    .*waist.*: 0.25
+    .*ankle.*: 0.5
+  max_delay: 4
+  alpha: [0.9, 0.9]
+  alpha_wide: [0.8, 1.0]
+  alpha_jit_scale: 0.025
+  boot_protect: True
+
+flags: []
+command:
+  _target_: active_adaptation.envs.mdp.commands.motion_tracking.MotionTrackingCommand_impedance
+  student_train: True
+  teleop:
+    enabled: False
+    obs_source: motion
+  max_force: 120.0
+  net_force_limit: 120.0
+  net_torque_limit: 20.0
+  force_safe_bounds: [30.0, 30.0]
+  force_safe_default: 30.0
+  force_penalty_offset: 15.0
+  ignore_joint_patterns: []
+  joint_patterns: ["waist_*", ".*_hip_.*", ".*_knee.*", ".*wrist.*"]
+  dataset:
+    mem_paths:
+      # - interx
+      # - lafan
+      # - amass_full_safe
+      # - amass_full_safe_hand
+      # - amass
+      # - limmt_amass_full
+      - limmt_no_foot_compliance_full
+    path_weights:
+      # - 0.4
+      # - 0.2
+      - 1.0
+  dataset_extra_keys: []
+  init_noise:
+    root_pos: 0.03
+    root_ori: 0.1
+    root_lin_vel: 0.1
+    root_ang_vel: 0.1
+    joint_pos: 0.1
+    joint_vel: 0.1
+  reward_sigma:
+    root_pos: [0.3]
+    root_vel: [1.0, 0.5]
+    root_rot: [1.0, 0.5]
+    root_ang_vel: [3.0]
+    
+    keypoint: [0.3] # product
+    lower_keypoint: [0.3] # product
+    ee: [0.2] # end-effector (wrist) tracking
+    ee_rot: [1.0, 0.5] # optional end-effector orientation tracking
+    # feet: [0.2] # feet position tracking
+
+    force_target: [0.3] # product
+    force_target_vel: [1.0, 0.5] # product
+    force: [8.0, 4.0] # product
+
+    joint_pos: [0.4, 0.2] # product
+    joint_vel: [2.0, 1.0] # product
+
+observation:
+  policy:
+    boot_indicator_state: {}
+    command: {}
+    # head_and_wrist_6d: {}
+    root_and_wrist_6d: {}
+    # feet_pos_b: {}
+    # target_pos_b_obs: {}
+    # target_linvel_b_obs: {}
+    # relative_quat_obs: {}
+    # target_projected_gravity_b: {}
+
+    root_ang_vel_history:      {history_steps: [0], noise_std: 0.05}
+    projected_gravity_history: {history_steps: [0], noise_std: 0.01}
+
+    joint_pos_history:         {history_steps: [0, 1, 2, 3, 4], noise_std: 0.005} # [0, 1, 2, 3, 4, 8]
+    prev_actions:   {steps: 3}
+  joint_target:
+    # Teacher-only: direct joint target input (not compressed through encoder)
+    target_joint_pos_obs: {}
+  priv:
+    # tracking (removed target_joint_pos_obs, now in joint_target)
+    # target_joint_pos_obs: {}
+    target_pos_b_obs: {}
+    target_linvel_b_obs: {}
+    relative_quat_obs: {}
+    target_projected_gravity_b: {}
+    # impedance
+    force_priv:       {}
+    # feet & support
+    body_height:      {body_names: ["pelvis", "torso_link", ".*ankle_roll_link"]}
+    contact_forces:   {body_names: .*ankle_roll_link}
+    # root
+    root_linvel_b:    {ema: 0.2}
+    root_ang_vel_history:      {history_steps: [0, 1, 2, 3, 4, 5, 6, 7, 8], noise_std: 0.0}
+    projected_gravity_history: {history_steps: [0, 1, 2, 3, 4, 5, 6, 7, 8], noise_std: 0.0}
+    # joint
+    joint_pos_history:         {history_steps: [0, 1, 2, 3, 4, 5, 6, 7, 8], noise_std: 0.0}
+    # bodies
+    current_keypoint_b: {}
+    current_keypoint_vel_b: {}
+    target_keypoints_diff_b_obs: {}
+    # action&torque
+    applied_action:   {}
+    applied_torque:   {}
+  priv_critic:
+    cum_error:        {}
+
+reward:
+  _student_train_: False
+  impedance:
+    force_reward: {weight: 2.0}
+    force_exd_penalty: {weight: 6.0}
+
+    force_target_tracking: {weight: 2.0}
+    force_target_vel_tracking: {weight: 1.0}
+    keypoint_tracking_imp: {weight: 2.0}
+    lower_keypoint_tracking: {weight: 2.0}
+  tracking:
+    root_pos_tracking:     {weight: 0.5}
+    root_rot_tracking:  {weight: 0.5}
+    root_vel_tracking:     {weight: 1.0}
+    root_ang_vel_tracking: {weight: 1.0}
+
+    joint_pos_tracking:    {weight: 1.0}
+    joint_vel_tracking:    {weight: 0.5}
+    ee_tracking:           {weight: 2.0}
+    ee_rot_tracking:       {weight: 0.0, enabled: false}
+    # feet_tracking:         {weight: 2.0}
+  loco:
+    survival:           {weight: 5.0, enabled: true}
+    impact_force_l2:    {weight: 4.0, enabled: true, body_names: .*ankle_roll_link}
+    feet_slip:          {weight: 2.0, enabled: true, body_names: .*ankle_roll_link}
+    joint_vel_l2:       {weight: 5.0e-4, enabled: true, joint_names: .*}
+    action_rate_l2:     {weight: 0.2, enabled: true} # 0.1
+    feet_air_time_ref:      {weight: 10.0, enabled: true, body_names: [left_ankle_roll_link, right_ankle_roll_link], thres: 0.8}
+    joint_pos_limits:   {weight: 1.0, joint_names: ".*", soft_factor: 0.9, enabled: true}
+    feet_contact_count: {weight: 1.0, enabled: false, body_names: .*ankle_roll_link, }
+
+randomization:
+  perturb_body_com:
+    body_names: ["pelvis", "torso_link"]
+    com_range: [-0.02, 0.02]
+  perturb_body_materials:
+    body_names: ".*ankle_roll_link"
+    static_friction_range: [0.3, 1.6]
+    dynamic_friction_frac_range: [0.75, 1.0]
+    restitution_range: [0.0, 0.2]
+  motor_params_implicit:
+    stiffness_range:
+      .*: [0.9, 1.1]
+    damping_range:
+      .*: [0.9, 1.1]
+    armature_range:
+      .*: [0.75, 1.25]
+  random_joint_offset: 
+    .*: [-0.01, 0.01]
+
+termination:
+  cum_error: {thres: 1.0, min_steps: 50}

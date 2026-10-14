@@ -1,0 +1,13 @@
+# Collision test scene - dynamic box that can be pushed
+# If this box can be pushed by the robot, collision detection works
+# If it can't, there's a fundamental issue with robot collision
+
+objects:
+  # One larger dynamic box on top of the platform (easy to pick up)
+  - type: box_dynamic
+    name: big_box
+    pos: [0.2, 0.0, 0.88]
+    size: [0.16, 0.16, 0.16]
+    color: [0.2, 0.6, 0.9]
+    mass: 0.2
+

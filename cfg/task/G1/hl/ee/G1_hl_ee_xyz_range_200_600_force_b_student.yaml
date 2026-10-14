@@ -1,0 +1,45 @@
+name: G1HLEEXYZRANGE200600FORCEBSTUDENT
+
+defaults:
+  - /task/G1/hl/ee/G1_hl_ee_compliance_pos_delta_force_b_student@_here_
+  - /task/G1/hl/task/ee_compliance_xyz_range@_here_
+  - _self_
+
+command:
+  # Mixed reset distribution: 50% continuous xyz values, 30% independently
+  # sampled levels, and 20% important expert/endpoint anchor combinations.
+  net_pull_ee_compliance_stiffness_levels: [200.0, 300.0, 400.0, 500.0, 600.0]
+  net_pull_ee_compliance_stiffness_levels_prob: 0.30
+  net_pull_ee_compliance_stiffness_xyz_anchors:
+    - [200.0, 200.0, 200.0]
+    - [600.0, 600.0, 600.0]
+    - [200.0, 600.0, 600.0]
+    - [600.0, 200.0, 600.0]
+    - [600.0, 600.0, 200.0]
+    - [400.0, 600.0, 600.0]
+    - [600.0, 400.0, 600.0]
+    - [600.0, 600.0, 400.0]
+  net_pull_ee_compliance_stiffness_anchor_prob: 0.20
+  # A quarter of training episodes hold random root-frame EE positions fixed,
+  # reducing the motion-reference mismatch with the compliance evaluator.
+  synthetic_ee_target:
+    enabled: true
+    train_only: true
+    prob: 0.25
+
+reward:
+  ee_compliance:
+    ee_force_compliance_tracking:
+      # The command manager replaces this nominal value with the sampled
+      # per-environment [kx, ky, kz] during net-pull evaluation/training.
+      stiffness: [200.0, 200.0, 200.0]
+      max_offset: [0.25, 0.25, 0.25]
+    ee_force_stiffness_consistency:
+      weight: 3.0
+      force_scale: 15.0
+      sigma: 1.0
+      force_deadband: 0.5
+    ee_force_limit_penalty:
+      stiffness: [200.0, 200.0, 200.0]
+      force_limit: [15.0, 15.0, 15.0]
+      use_command_stiffness: true

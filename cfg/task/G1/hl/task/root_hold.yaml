@@ -1,0 +1,4 @@
+reward:
+  root_hold:
+    root_position_hold: {weight: 5.0, sigma: 0.25, mode: xy}
+    root_height_hold: {weight: 3.0, sigma: 0.08, target_height: 0.79}

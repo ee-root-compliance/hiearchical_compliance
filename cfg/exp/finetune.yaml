@@ -1,0 +1,15 @@
+# @package _global_
+
+defaults:
+  - override /algo: ppo_finetune
+
+task:
+  command:
+    student_train: True
+  reward:
+    _student_train_: True
+    loco:
+      joint_vel_l2:    {weight: 2.0e-3, enabled: true, joint_names: .*}
+      action_rate_l2:  {weight: 0.5, enabled: true}
+
+total_frames: 2000_000_000

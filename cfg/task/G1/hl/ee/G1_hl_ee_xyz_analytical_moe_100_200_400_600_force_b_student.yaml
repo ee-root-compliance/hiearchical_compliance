@@ -1,0 +1,21 @@
+name: G1HLEEXYZANALYTICALMOE100200400600FORCEBSTUDENT
+
+defaults:
+  - /task/G1/hl/ee/G1_hl_ee_xyz_analytical_moe_200_600_force_b_student@_here_
+  - _self_
+
+command:
+  # The four-anchor analytical MoE supports the complete [100, 600] range.
+  net_pull_ee_compliance_stiffness_xyz_range:
+    - [100.0, 100.0, 100.0]
+    - [600.0, 600.0, 600.0]
+
+action:
+  ee_command:
+    # The 100-N/m experts can produce up to 0.35 m along their soft axis.
+    pos_scale: [0.35, 0.35, 0.35]
+
+reward:
+  ee_compliance:
+    ee_force_compliance_tracking:
+      max_offset: [0.35, 0.35, 0.35]

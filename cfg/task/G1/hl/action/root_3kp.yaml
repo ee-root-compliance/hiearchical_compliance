@@ -1,0 +1,5 @@
+action:
+  command_dim: 5
+  command_scale: [0.15, 0.5, 0.5, 0.6, 0.6]
+  low_policy_command_slice: [1, 7]
+  low_policy_obs_key: low_policy

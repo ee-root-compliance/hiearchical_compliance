@@ -1,0 +1,19 @@
+observation:
+  hl_policy:
+    # Locomotion compliance is defined on the root command interface, not on EE/feet targets.
+    root_and_wrist_6d: {enabled: false}
+    feet_pos_b: {enabled: false}
+    root_command_reference: {}
+    prev_root_commands: {steps: 3}
+    prev_high_actions: {steps: 3}
+reward:
+  root_hold:
+    root_position_hold: {weight: 0.0, sigma: 0.25, mode: xy, enabled: false}
+    root_force_spring_tracking: {weight: 0.0, stiffness: 400.0, sigma: 0.25, max_offset: 0.5, force_deadband: 5.0, enabled: false}
+    root_force_velocity_tracking: {weight: 5.0, damping: 60.0, max_speed: null, sigma: 0.25, force_deadband: 0.0, add_root_command_reference: true}
+    root_force_direction_progress: {weight: 0.0, target_speed: 0.5, force_deadband: 0.0, enabled: false}
+    root_height_hold: {weight: 2.0, sigma: 0.08, target_height: 0.79}
+  regularization:
+    high_action_l2: {weight: 0.005}
+    high_action_rate_l2: {weight: 0.10}
+    high_action_rate2_l2: {weight: 0.05}

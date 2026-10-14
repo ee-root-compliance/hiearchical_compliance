@@ -1,0 +1,19 @@
+name: G1MANIPULATION
+
+defaults:
+  - /task/G1/G1_base
+  - _self_
+
+# Manipulation-specific configuration
+task_name: "G1_manipulation"
+
+# Use the teleoperation command system (VR input)
+command:
+  _target_: active_adaptation.envs.mdp.commands.teleoperation.TeleopCommand
+  bind_port: 15000
+
+# Optional: override reward configuration
+# reward:
+#   manipulation:
+#     grasping: {weight: 1.0}
+#     object_tracking: {weight: 2.0}

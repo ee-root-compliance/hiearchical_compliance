@@ -1,0 +1,14 @@
+# @package algo
+defaults:
+  - root_student_ppo
+  - _self_
+
+name: root_student_force_ppo
+phase: train
+
+# Estimate net-pull force explicitly from deployable student observations and
+# feed that estimate directly to the student actor. The teacher actor receives
+# the true group with the same dimensionality.
+direct_priv_keys: [hl_force_priv]
+direct_pred_weight: 1.0
+critic_in_keys: [hl_policy, hl_priv, hl_force_priv]

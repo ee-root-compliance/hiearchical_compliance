@@ -1,0 +1,40 @@
+name: G13KPEEXYZRANGE100600
+
+defaults:
+  - /task/G1/G1_3kp_ee_net_pull_force_b@_here_
+  - _self_
+
+command:
+  # Independently sample kx, ky, and kz from [100, 600] N/m.
+  # 30 N / 100 N/m = 0.30 m; keep the target unclipped at the lower endpoint.
+  net_pull_ee_compliance_max_offset: [0.35, 0.35, 0.35]
+  net_pull_ee_compliance_stiffness_xyz_range:
+    - [100.0, 100.0, 100.0]
+    - [600.0, 600.0, 600.0]
+  # Preserve endpoint, intermediate, and mixed-axis coverage while retaining
+  # continuous sampling over the full range for the remaining episodes.
+  net_pull_ee_compliance_stiffness_levels:
+    [100.0, 150.0, 200.0, 300.0, 400.0, 500.0, 550.0, 600.0]
+  net_pull_ee_compliance_stiffness_levels_prob: 0.30
+  net_pull_ee_compliance_stiffness_xyz_anchors:
+    - [100.0, 100.0, 100.0]
+    - [600.0, 600.0, 600.0]
+    - [100.0, 600.0, 600.0]
+    - [600.0, 100.0, 600.0]
+    - [600.0, 600.0, 100.0]
+    - [150.0, 300.0, 500.0]
+    - [150.0, 500.0, 300.0]
+    - [300.0, 150.0, 500.0]
+    - [300.0, 500.0, 150.0]
+    - [500.0, 150.0, 300.0]
+    - [500.0, 300.0, 150.0]
+  net_pull_ee_compliance_stiffness_anchor_prob: 0.20
+  synthetic_ee_target:
+    enabled: true
+    train_only: true
+    prob: 0.25
+
+observation:
+  policy:
+    # Three normalized values [kx, ky, kz] in [-1, 1].
+    net_pull_ee_compliance_stiffness_command: {}

@@ -1,0 +1,13 @@
+name: G1HLFORCEWALKFORCEBSTUDENT
+
+defaults:
+  - /task/G1/hl/root/G1_hl_force_walk_student@_here_
+  - _self_
+
+observation:
+  hl_force_priv:
+    net_pull_force_priv: {enabled: false}
+    net_pull_force_b_priv: {}
+  hl_priv:
+    net_pull_force_priv: {enabled: false}
+    net_pull_force_b_priv: {}

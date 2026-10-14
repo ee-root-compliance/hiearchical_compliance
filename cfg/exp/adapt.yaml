@@ -1,0 +1,12 @@
+# @package _global_
+
+defaults:
+  - override /algo: ppo_adapt
+
+task:
+  command:
+    student_train: True
+  reward:
+    _student_train_: True
+
+total_frames: 1000_000_000

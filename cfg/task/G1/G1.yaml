@@ -1,0 +1,27 @@
+# @package task
+name: G1AMP
+
+viewer:
+  resolution: [1280, 720]
+  lookat: [0., 0., 0.]
+  eye: [4.0, 4.0, 4.0]
+
+robot: 
+  name: g1
+terrain: plane
+
+# common
+num_envs: 16384 # 16384
+max_episode_length: 1000
+
+sim:
+  step_dt: 0.02
+  isaac_physics_dt: 0.005
+  mujoco_physics_dt: 0.002
+
+
+command: {}
+observation: {}
+reward: {}
+randomization: {}
+termination: {}

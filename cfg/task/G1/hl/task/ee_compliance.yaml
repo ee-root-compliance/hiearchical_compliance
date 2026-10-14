@@ -1,0 +1,88 @@
+command:
+  force_active_pattern:
+    - ".*hand_mimic"
+  synthetic_ee_target:
+    enabled: false
+    train_only: true
+    prob: 0.5
+    # Root-frame xyz ranges from the real motion p5-p95 distribution.
+    # Synthetic targets replace only EE xyz; EE orientation still comes from motion.
+    left_range:
+      - [-0.029, 0.038, -0.205]
+      - [0.377, 0.537, 0.385]
+    right_range:
+      - [-0.045, -0.477, -0.205]
+      - [0.421, -0.028, 0.441]
+  motion_ee_coverage_resample:
+    enabled: false
+    train_only: true
+    candidates: 32
+    bins: 16
+    power: 0.5
+    # Use only real motion frames. These p5-p95 ranges define the density bins.
+    left_range:
+      - [-0.029, 0.038, -0.205]
+      - [0.377, 0.537, 0.385]
+    right_range:
+      - [-0.045, -0.477, -0.205]
+      - [0.421, -0.028, 0.441]
+  net_pull_margin_aware: false
+  net_pull_margin_min_force: 5.0
+  net_pull_margin_safety: 0.9
+  net_pull_margin_resample_attempts: 32
+  net_pull_margin_left_range:
+    - [-0.029, 0.038, -0.205]
+    - [0.377, 0.537, 0.385]
+  net_pull_margin_right_range:
+    - [-0.045, -0.477, -0.205]
+    - [0.421, -0.028, 0.441]
+  net_pull_ee_compliance_stiffness: ${task.reward.ee_compliance.ee_force_compliance_tracking.stiffness}
+  net_pull_ee_compliance_max_offset: ${task.reward.ee_compliance.ee_force_compliance_tracking.max_offset}
+  net_pull_ee_compliance_smoothing: true
+  net_pull_ee_compliance_force_deadband: ${task.reward.ee_compliance.ee_force_compliance_tracking.force_deadband}
+  reward_sigma:
+    feet: [0.2]
+
+observation:
+  hl_policy:
+    root_and_wrist_6d: {enabled: false}
+    feet_pos_b: {enabled: false}
+    root_and_wrist_6d_reference: {}
+    prev_ee_commands: {steps: 3}
+    ee_compliance_state:
+      enabled: false
+      stiffness: ${task.reward.ee_compliance.ee_force_compliance_tracking.stiffness}
+      max_offset: ${task.reward.ee_compliance.ee_force_compliance_tracking.max_offset}
+      force_deadband: ${task.reward.ee_compliance.ee_force_compliance_tracking.force_deadband}
+    prev_high_actions: {steps: 3}
+
+reward:
+  loco:
+    survival: {weight: 0.0, enabled: false}
+    impact_force_l2: {weight: 0.0, enabled: false}
+    feet_slip: {weight: 0.0, enabled: false}
+    joint_vel_l2: {weight: 0.0, enabled: false}
+    action_rate_l2: {weight: 0.0, enabled: false}
+    feet_air_time_ref: {weight: 0.0, enabled: false}
+    joint_pos_limits: {weight: 0.0, enabled: false}
+    feet_contact_count: {weight: 0.0, enabled: false}
+  root_hold:
+    root_position_hold: {weight: 0.0, sigma: 0.25, mode: xy, enabled: false}
+    root_height_hold: {weight: 0.0, sigma: 0.08, target_height: 0.79, enabled: false}
+  ee_compliance:
+    ee_force_compliance_tracking:
+      weight: 5.0
+      stiffness: 200.0
+      sigma: 0.10
+      max_offset: 0.25
+      force_deadband: 0.0
+    ee_force_limit_penalty:
+      weight: 2.0
+      stiffness: ${task.reward.ee_compliance.ee_force_compliance_tracking.stiffness}
+      force_limit: [15.0, 15.0, 15.0]
+      force_deadband: ${task.reward.ee_compliance.ee_force_compliance_tracking.force_deadband}
+      power: 1.0
+    ee_orientation_tracking:
+      weight: 0.0
+      sigma: [1.0, 0.5]
+      enabled: false

@@ -1,0 +1,27 @@
+# Table scene for tabletop manipulation
+# Usage: python scripts/eval_manipulation.py --run_path xxx -p --objects cfg/objects/table_scene.yaml
+
+objects:
+  # Table in front of robot
+  - type: table
+    name: table
+    pos: [0.6, 0.0, 0.0]
+    size: [0.6, 0.8, 0.03]
+    height: 0.4
+    color: [0.55, 0.35, 0.2]
+
+  # Object on table
+  - type: box_dynamic
+    name: box_on_table
+    pos: [0.5, 0.0, 0.45]
+    size: [0.06, 0.06, 0.06]
+    color: [0.9, 0.2, 0.2]
+    mass: 0.3
+
+  # Another object
+  - type: sphere_dynamic
+    name: ball_on_table
+    pos: [0.6, 0.15, 0.43]
+    radius: 0.04
+    color: [0.2, 0.8, 0.3]
+    mass: 0.2

@@ -1,0 +1,21 @@
+name: G1HLEEXYZANALYTICALMOE200600FORCEBSTUDENT
+
+defaults:
+  - /task/G1/hl/ee/G1_hl_ee_xyz_range_200_600_force_b_student@_here_
+  - _self_
+
+action:
+  low_policy:
+    # The MoE has no single high-level checkpoint from which to inherit this
+    # deployment dependency. Use the same frozen low-level controller as the
+    # seven trained high-level students and load it before the sweep starts.
+    run_path: null
+    preload: true
+
+observation:
+  hl_policy:
+    # Fixed experts were trained without a stiffness command in hl_policy.
+    net_pull_ee_compliance_stiffness_command: {enabled: false}
+  hl_moe:
+    # The analytical gate alone consumes normalized [kx, ky, kz].
+    net_pull_ee_compliance_stiffness_command: {}
