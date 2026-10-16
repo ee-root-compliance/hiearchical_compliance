@@ -1,19 +1,69 @@
-[← README](../README.md)
+[← README](../README.md) · [简体中文](ceer1_zh.md)
 
-## CEER1 compliance training
+# Low-level policy training
 
-The compliant low-level configuration is [G1_3kp.yaml](../cfg/task/G1/G1_3kp.yaml).
-Select it explicitly; the launcher's default `stiff30` trains the stiff backbone used by CEER2.
+This guide covers the available low-level policies, their shared training workflow, and how to use the resulting checkpoints. All options use `train.sh`.
+
+## Policy options
+
+| Policy | Pipeline | Purpose | Configuration |
+|---|---|---|---|
+| CEER1 compliant low-level | `ceer1` | Yield to external forces while tracking motion | [G1_3kp.yaml](../cfg/task/G1/G1_3kp.yaml) |
+| CEER2 stiff backbone | `stiff30` (default) | Track commands under disturbances, beneath high-level compliance policies | [G1_3kp_stiff.yaml](../cfg/task/G1/G1_3kp_stiff.yaml) |
+| Fixed-stiffness baseline | `fixed_ee` | End-to-end EE compliance at 200 N/m | [G1_3kp_ee_net_pull_force_b.yaml](../cfg/task/G1/G1_3kp_ee_net_pull_force_b.yaml) |
+| Ranged-stiffness baseline | `range_100_600` | End-to-end independently commanded xyz compliance over 100–600 N/m | [G1_3kp_ee_xyz_range_100_600.yaml](../cfg/task/G1/G1_3kp_ee_xyz_range_100_600.yaml) |
+| 5-keypoint policy | `5kp` | Optional five-keypoint control | [G1_5kp.yaml](../cfg/task/G1/G1_5kp.yaml) |
+
+## 1. Prepare the environment and data
+
+Complete [installation](installation.md) and [data preparation](data.md), then configure W&B:
 
 ```bash
+wandb login
 export WANDB_ENTITY=your-wandb-user-or-team
-CUDA_VISIBLE_DEVICES=0 NPROC=1 PIPELINE=ceer1 \
-  LOW_WANDB_PROJECT=my-low-level bash train.sh
+export LOW_WANDB_PROJECT=my-low-level
 ```
 
-This runs train → adapt → finetune with `task=G1/G1_3kp`.
+## 2. Launch training
 
-### How compliance is learned
+Select a `PIPELINE` from the table above. This example trains the CEER1 compliant policy:
+
+```bash
+CUDA_VISIBLE_DEVICES=0 NPROC=1 PIPELINE=ceer1 bash train.sh
+```
+
+Four GPUs:
+
+```bash
+CUDA_VISIBLE_DEVICES=0,1,2,3 NPROC=4 PIPELINE=ceer1 bash train.sh
+```
+
+For the CEER2 stiff backbone, replace `PIPELINE=ceer1` with `PIPELINE=stiff30`. Select other policies the same way. If omitted, `PIPELINE` defaults to `stiff30`.
+
+The script automatically runs train → adapt → finetune, using 4B, 1B, and 2B environment frames respectively. Each stage loads the previous checkpoint through W&B. Frame counts are accumulated across environments.
+
+## 3. Use the trained policy
+
+The final run name depends on the selected policy. For CEER1:
+
+```text
+<entity>/<project>/ceer1_3kp_compliant_finetune_<timestamp>
+```
+
+Pass this path as `--run_path` for [interactive teleoperation](teleoperation.md) or [evaluation](evaluation.md).
+
+After training the CEER2 stiff backbone, use the printed `LOW_RUN_PATH` for [high-level training](ceer2.md).
+
+## How the training objectives differ
+
+**CEER2 stiff:** keeps external disturbances but disables compliance target shifts, force-matching rewards, and excess-force penalties, learning to preserve tracking under disturbances.
+
+**CEER1 compliant:**
+
+Spring anchors apply external forces during training. An admittance model combines those forces with the motion reference to generate position and velocity targets that can yield under load. Rewards encourage the policy to track these targets while preserving whole-body motion and stability.
+
+<details>
+<summary>Parameters and implementation</summary>
 
 - The command class defaults to `compliance=True` and `external_force_mode=legacy`. The legacy mode applies displacement-dependent spring forces from sampled anchors; this is not the fixed-force `net_pull` baseline.
 - A numerical admittance model generates compliant position and velocity targets. Its drive pulls toward the motion reference, while external spring forces allow the target to yield.
@@ -24,25 +74,10 @@ In the target model, the drive gain is `K_p = force_safe_limit / 0.05`, giving 1
 
 Implementation: [MotionTrackingCommand_impedance](../active_adaptation/envs/mdp/commands/motion_tracking.py) (`force_update_origin_and_target`, `force_apply`, and the force rewards), and [AdmittanceMassChain](../active_adaptation/envs/mdp/commands/admittance.py).
 
-### Choose the appropriate configuration
+</details>
 
-| Pipeline | Configuration | Behavior |
-|---|---|---|
-| `ceer1` | [G1_3kp.yaml](../cfg/task/G1/G1_3kp.yaml) | Compliant low-level control using anchor forces and admittance targets |
-| `stiff30` (default) | [G1_3kp_stiff.yaml](../cfg/task/G1/G1_3kp_stiff.yaml) | CEER2 backbone: `compliance=False`; force matching and excess-force rewards disabled |
-| `fixed_ee` | [G1_3kp_ee_net_pull_force_b.yaml](../cfg/task/G1/G1_3kp_ee_net_pull_force_b.yaml) | Fixed 200 N/m EE baseline using hand-only net-pull forces |
-
-These descriptions reflect the configurations currently shipped in this repository. Exact reproduction of a historical CEER1 checkpoint also requires its saved training configuration.
-
-## Low-level training
-
-`train.sh` runs the low-level teacher-student pipeline:
-
-```text
-train       4B environment frames
-adapt       1B environment frames
-finetune    2B environment frames
-```
+<details>
+<summary>Launcher environment variables</summary>
 
 All settings are environment variables:
 
@@ -56,38 +91,5 @@ All settings are environment variables:
 | `MASTER_PORT` | `29501` | `torchrun` port |
 | `RUN_TIMESTAMP` | current time | Suffix of the W&B run ids |
 
-```bash
-# Shared 3-keypoint stiff backbone; maximum external force is 30 N.
-PIPELINE=stiff30 LOW_WANDB_PROJECT=my-low-level bash train.sh
-
-# End-to-end fixed 200xyz compliance baseline.
-PIPELINE=fixed_ee LOW_WANDB_PROJECT=my-low-level bash train.sh
-
-# End-to-end independently ranged xyz compliance baseline over 100--600 N/m.
-PIPELINE=range_100_600 LOW_WANDB_PROJECT=my-low-level bash train.sh
-
-# Optional 5-keypoint locomotion policy.
-PIPELINE=5kp LOW_WANDB_PROJECT=my-low-level bash train.sh
-
-# Single GPU:
-CUDA_VISIBLE_DEVICES=0 NPROC=1 PIPELINE=stiff30 LOW_WANDB_PROJECT=my-low-level bash train.sh
-```
-
-The corresponding task configs are:
-
-```text
-cfg/task/G1/G1_3kp_stiff.yaml
-cfg/task/G1/G1_3kp_ee_net_pull_force_b.yaml
-cfg/task/G1/G1_3kp_ee_xyz_range_100_600.yaml
-cfg/task/G1/G1_5kp.yaml
-```
-
-When the pipeline finishes, it prints the run path for high-level training:
-
-```text
-LOW_RUN_PATH=<entity>/<project>/compliance_3kp_stiff_finetune_limmt_full_force30_<timestamp>
-```
-
-To start from a local file instead, pass `checkpoint_path=/path/to/checkpoint.pt`
-to `scripts/train.py`.
+</details>
 

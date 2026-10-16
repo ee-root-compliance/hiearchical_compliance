@@ -29,7 +29,7 @@ CEER2 uses a frozen stiff backbone built on the CEER1 interface. High-level expe
 |---|---|
 | Try compliance in your browser | [Live Demo — no installation](https://ee-root-compliance.github.io/live-demo/) |
 | Set up Isaac Lab and prepare motions | [Installation](docs/installation.md) · [Dataset](docs/data.md) |
-| Train the compliant low-level controller | [CEER1 / compliance training](docs/ceer1.md) |
+| Train low-level policies: CEER1 compliant, CEER2 stiff, or baselines | [Low-level training](docs/ceer1.md) |
 | Add directional EE and root compliance | [CEER2 / high-level training & MoE](docs/ceer2.md) |
 | Control the robot interactively | [Keyboard teleoperation & scenes](docs/teleoperation.md) |
 | Evaluate stiffness or compare baselines | [Evaluation](docs/evaluation.md) |
