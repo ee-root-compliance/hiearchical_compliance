@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="400" viewBox="0 0 1000 400" role="img" aria-labelledby="title desc">
+  <title id="title">CEER1 and CEER2 control stack</title>
+  <desc id="desc">CEER2 high-level policies and analytical MoE send EE-root commands to a CEER1 low-level whole-body policy. Teleoperation or a planner can also supply commands directly. The low-level policy produces joint actions.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#52677c"/></marker>
+  </defs>
+  <rect width="1000" height="400" rx="18" fill="#f7f9fc"/>
+  <g font-family="Arial, Helvetica, sans-serif">
+    <rect x="310" y="24" width="660" height="116" rx="14" fill="#e9e3fb" stroke="#b9a7de"/>
+    <text x="334" y="57" font-size="24" font-weight="700" fill="#533780">CEER2 · High-level compliance</text>
+    <text x="334" y="88" font-size="19" fill="#344259">EE: analytical MoE · directional stiffness 100–600 N/m</text>
+    <text x="334" y="117" font-size="19" fill="#344259">Root: resist · low damping · high damping</text>
+    <path d="M640 140 V207" stroke="#52677c" stroke-width="3" marker-end="url(#arrow)"/>
+    <text x="660" y="182" font-size="18" fill="#344259">EE–root commands</text>
+    <rect x="24" y="214" width="246" height="106" rx="14" fill="#ffffff" stroke="#c4ceda"/>
+    <text x="147" y="251" text-anchor="middle" font-size="21" fill="#344259">Teleoperation / planner</text>
+    <text x="147" y="283" text-anchor="middle" font-size="17" fill="#52677c">Direct EE–root commands</text>
+    <path d="M270 267 H307" stroke="#52677c" stroke-width="3" marker-end="url(#arrow)"/>
+    <rect x="310" y="214" width="660" height="106" rx="14" fill="#deedf8" stroke="#9bbfdc"/>
+    <text x="334" y="252" font-size="24" font-weight="700" fill="#245a80">CEER1 · Low-level whole-body control</text>
+    <text x="334" y="287" font-size="19" fill="#344259">Track end-effector and root commands</text>
+    <path d="M640 320 V369" stroke="#52677c" stroke-width="3" marker-end="url(#arrow)"/>
+    <text x="660" y="355" font-size="18" fill="#344259">Joint actions</text>
+    <text x="640" y="392" text-anchor="middle" font-size="19" font-weight="700" fill="#344259">Humanoid</text>
+  </g>
+</svg>
