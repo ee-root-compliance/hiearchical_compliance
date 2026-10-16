@@ -1,56 +1,62 @@
-[← README](../README.md)
+[← README](../README.md) · [简体中文](data_zh.md)
 
-## Dataset
+# Data preparation
 
-The motion datasets are not redistributed in this repository. Obtain them from
-their official distribution channels, such as [AMASS](https://amass.is.tue.mpg.de/),
-and follow their licenses.
+If you already have complete G1 NPZ motions, skip to step 3 and use their directory as input.
 
-### Input format
+## 1. Install the retargeter (once)
 
-Each input `.npz` must be a motion clip **already retargeted to the Unitree G1**
-and sampled at **50 Hz**. Raw AMASS SMPL files are not accepted, and the
-converter does not resample.
+Download SMPL-X motions from [AMASS](https://amass.is.tue.mpg.de/) and obtain the SMPL-X body models following the [official GMR instructions](https://github.com/YanjieZe/GMR). The model directory should contain `smplx/SMPLX_NEUTRAL.npz` and the other required gender models.
 
-A G1-retargeted file contains:
+Install official GMR in a separate environment:
 
-| Key | Shape | Notes |
-|---|---|---|
-| `joint_names` | (J,) | Must include all 29 G1 joints, in any order |
-| `body_names` | (B,) | G1 links plus `head_mimic`, `left_hand_mimic`, `right_hand_mimic` |
-| `root_pos` | (T, 3) | World position, metres |
-| `root_rot` | (T, 4) | World orientation, quaternion **xyzw** |
-| `dof_pos` | (T, J) | Radians, in `joint_names` order |
-| `local_body_pos` | (T, B, 3) | Body positions in the root frame |
-| `local_body_rot` | (T, B, 4) | Body orientations relative to the root, **xyzw** |
-| `mocap_framerate`, `frequency`, or `fps` | scalar | Must be 50 |
+```bash
+conda create -n ceer-retarget python=3.10 -y
+conda activate ceer-retarget
+git clone https://github.com/YanjieZe/GMR.git /path/to/GMR
+export GMR_ROOT=/path/to/GMR
+git -C "$GMR_ROOT" checkout 12a1d14b049e358dc182de9c679b30b96a215191
+pip install -e "$GMR_ROOT"
+pip install numpy==2.2.6 scipy==1.15.3 mujoco==3.4.0 mink==1.0.0 \
+  daqp==0.7.2 qpsolvers==4.8.2 smplx==0.1.28 torch==2.9.1
+```
 
-The LIMMT keypoint format (`qpos`, `qvel`, `kpt2gv_pose`, `gv2wrd_pose`) is also
-accepted, but lacks the head and wrist bodies used by the 3-keypoint tasks.
+## 2. Generate G1 motions
 
-### Directory layout
+From this repository's root, in the `ceer-retarget` environment:
 
-Allowlist paths are relative to `--dataset-root`, e.g.
-`<dataset-root>/ACCAD/Female1General_c3d/A14_-_stand_to_skip_stageii.npz`.
-The root should contain only motion `.npz` files.
+```bash
+MUJOCO_GL=disable OMP_NUM_THREADS=1 python scripts/data_process/retarget_amass.py \
+  --input /path/to/AMASS_SMPLX \
+  --output dataset/g1_npz \
+  --body-models /path/to/body_models \
+  --allowlist scripts/data_process/allowlist_limmt_no_foot_compliance.json \
+  --report dataset/retarget_report.json
+```
 
-### Conversion
+This entry handles retargeting, 50 Hz interpolation, and end-effector frames. No additional GMR fork or PKL conversion step is needed. Preserve AMASS relative paths and filenames; use new output directories.
 
-Create the dataset used by all default task configs:
+## 3. Filter and pack
+
+Switch back to the [training environment](installation.md), named `humanoid-compliance` in the installation guide, and run from this repository's root:
 
 ```bash
 python scripts/data_process/generate_dataset.py \
-  --dataset-root /path/to/G1_retargeted_motions \
+  --dataset-root dataset/g1_npz \
   --allowlist scripts/data_process/allowlist_limmt_no_foot_compliance.json \
   --mem-path dataset/limmt_no_foot_compliance_full
 ```
 
-Or use the wrapper:
+Default training configurations load `dataset/limmt_no_foot_compliance_full/` directly. Continue with [low-level training](ceer1.md). Check the terminal's `matched ... allowlist segments` output to confirm the required segments were found.
 
-```bash
-DATASET_ROOT=/path/to/G1_retargeted_motions bash generate_limmt_amass_full_dataset.sh
-```
+<details>
+<summary>Compatibility and validation</summary>
 
-Datasets are loaded from `<repository>/dataset/`. To store them elsewhere, set
-`MEMPATH=/path/to/datasets`.
+The entry pins official GMR and supplies the required compatibility processing. See [provenance and end-to-end validation](retarget_compatibility.md) for comparison with historical data from raw AMASS.
+
+`--mem-path` is the data output directory. Memory mapping is a storage format, not a training step.
+
+For existing GMR PKL files, `convert_gmr_to_npz.py` performs format conversion without rerunning or altering upstream retargeting. See the [adapter validation](data_conversion_validation.md).
+
+</details>
 

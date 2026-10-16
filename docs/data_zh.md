@@ -1,42 +1,62 @@
-[← 中文首页](../README_zh.md)
+[← 中文首页](../README_zh.md) · [English](data.md)
 
-## 数据集
+# 数据准备
 
-动作数据集不包含在本仓库中。请从官方渠道（例如 [AMASS](https://amass.is.tue.mpg.de/)）获取数据，并遵守相应许可证。
+已有完整 G1 NPZ 数据时，直接执行第 3 步，将输入目录换成现有数据路径。
 
-### 输入格式
+## 1. 安装重定向工具（首次使用）
 
-每个输入 `.npz` 必须已经 retarget 到 Unitree G1，并以 50 Hz 采样。仓库不接受原始 AMASS SMPL 文件，也不会自动重采样。
+从 [AMASS](https://amass.is.tue.mpg.de/) 下载 SMPL-X 格式动作，并按 [GMR 官方说明](https://github.com/YanjieZe/GMR) 获取 SMPL-X 人体模型。模型目录应包含 `smplx/SMPLX_NEUTRAL.npz` 等对应性别的模型文件。
 
-一个 G1-retargeted 文件包含：
+在独立环境中安装官方 GMR：
 
-| Key | Shape | 说明 |
-|---|---|---|
-| `joint_names` | `(J,)` | 必须包含全部 29 个 G1 joints，顺序不限 |
-| `body_names` | `(B,)` | G1 links，以及 `head_mimic`、`left_hand_mimic`、`right_hand_mimic` |
-| `root_pos` | `(T, 3)` | 世界坐标位置，单位 m |
-| `root_rot` | `(T, 4)` | 世界坐标姿态，四元数顺序为 **xyzw** |
-| `dof_pos` | `(T, J)` | 单位 rad，顺序与 `joint_names` 一致 |
-| `local_body_pos` | `(T, B, 3)` | root frame 下的 body 位置 |
-| `local_body_rot` | `(T, B, 4)` | 相对 root 的 body 姿态，四元数顺序为 **xyzw** |
-| `mocap_framerate`、`frequency` 或 `fps` | scalar | 必须为 50 |
+```bash
+conda create -n ceer-retarget python=3.10 -y
+conda activate ceer-retarget
+git clone https://github.com/YanjieZe/GMR.git /path/to/GMR
+export GMR_ROOT=/path/to/GMR
+git -C "$GMR_ROOT" checkout 12a1d14b049e358dc182de9c679b30b96a215191
+pip install -e "$GMR_ROOT"
+pip install numpy==2.2.6 scipy==1.15.3 mujoco==3.4.0 mink==1.0.0 \
+  daqp==0.7.2 qpsolvers==4.8.2 smplx==0.1.28 torch==2.9.1
+```
 
-LIMMT keypoint 格式（`qpos`、`qvel`、`kpt2gv_pose`、`gv2wrd_pose`）也被支持，但其中不包含 3-keypoint task 使用的 head 和 wrist body。
+## 2. 生成 G1 动作
 
-### 数据转换
+在本仓库根目录、`ceer-retarget` 环境中运行：
+
+```bash
+MUJOCO_GL=disable OMP_NUM_THREADS=1 python scripts/data_process/retarget_amass.py \
+  --input /path/to/AMASS_SMPLX \
+  --output dataset/g1_npz \
+  --body-models /path/to/body_models \
+  --allowlist scripts/data_process/allowlist_limmt_no_foot_compliance.json \
+  --report dataset/retarget_report.json
+```
+
+本仓库入口会自动处理重定向、50 Hz 插值和末端坐标补全。无需安装额外的 GMR fork，也无需再运行 PKL 转换脚本。保留 AMASS 子目录和文件名；请使用新的输出目录。
+
+## 3. 筛选并生成训练数据
+
+切回[训练环境](installation_zh.md) `humanoid-compliance`，在本仓库根目录运行：
 
 ```bash
 python scripts/data_process/generate_dataset.py \
-  --dataset-root /path/to/G1_retargeted_motions \
+  --dataset-root dataset/g1_npz \
   --allowlist scripts/data_process/allowlist_limmt_no_foot_compliance.json \
   --mem-path dataset/limmt_no_foot_compliance_full
 ```
 
-也可以使用 wrapper：
+完成后，默认训练配置直接读取 `dataset/limmt_no_foot_compliance_full/`。接下来即可[训练底层策略](ceer1_zh.md)。检查终端的 `matched ... allowlist segments` 输出，确认所需片段已匹配。
 
-```bash
-DATASET_ROOT=/path/to/G1_retargeted_motions bash generate_limmt_amass_full_dataset.sh
-```
+<details>
+<summary>兼容性与验证记录</summary>
 
-默认 task 从 `<repository>/dataset/` 加载数据。若要保存到其他位置，设置 `MEMPATH=/path/to/datasets`。
+入口固定官方 GMR 版本，并包含本项目所需的数据兼容处理；来源说明及原始 AMASS 到历史数据的对比见[兼容性验证](retarget_compatibility.md)。
+
+这里的 `--mem-path` 是数据输出目录，memmap 是高效读取数据的存储格式，不是训练步骤。
+
+已有 GMR PKL 时，可使用 `convert_gmr_to_npz.py` 做格式转换，但它不会重做或改变上游 retarget 流程。[转换验证记录](data_conversion_validation.md)
+
+</details>
 
