@@ -29,7 +29,7 @@ CEER2 使用基于 CEER1 接口的冻结 stiff 底层策略。高层 expert 必�
 |---|---|
 | 在浏览器中体验柔顺控制 | [在线 Demo，无需安装](https://ee-root-compliance.github.io/live-demo/) |
 | 安装 Isaac Lab 并准备动作数据 | [环境安装](docs/installation_zh.md) · [数据准备](docs/data_zh.md) |
-| 训练底层全身控制策略 | [CEER1 / 底层训练](docs/ceer1_zh.md) |
+| 训练底层柔顺控制策略 | [CEER1 / 柔顺训练](docs/ceer1_zh.md) |
 | 添加末端方向柔顺和根部柔顺 | [CEER2 / 高层训练与 MoE](docs/ceer2_zh.md) |
 | 交互式控制机器人 | [键盘遥操作与场景](docs/teleoperation_zh.md) |
 | 评测刚度或比较 baseline | [评测指南](docs/evaluation_zh.md) |
@@ -65,5 +65,9 @@ CUDA_VISIBLE_DEVICES=0 python scripts/train.py \
 
 - **CEER（CEER1）：** [Compliant End-Effector and Root Control as a Unified Interface for Hierarchical Humanoid Loco-Manipulation](https://arxiv.org/abs/2605.19981)。
 - **CEER2：** [Directional and Tunable End-Effector and Root Compliance for Humanoid Loco-Manipulation](https://arxiv.org/abs/2609.38709)。
+
+## 致谢
+
+本项目在 [GentleHumanoid](https://github.com/Axellwppr/gentle-humanoid-training) 开源代码的基础上开发，其实现为 CEER 底层控制器提供了起点。感谢原作者的开源贡献。
 
 代码使用 [MIT License](LICENSE)。动作数据集遵循各自的原始许可证。[图片来源](docs/assets/README.md)。

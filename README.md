@@ -29,7 +29,7 @@ CEER2 uses a frozen stiff backbone built on the CEER1 interface. High-level expe
 |---|---|
 | Try compliance in your browser | [Live Demo — no installation](https://ee-root-compliance.github.io/live-demo/) |
 | Set up Isaac Lab and prepare motions | [Installation](docs/installation.md) · [Dataset](docs/data.md) |
-| Train the low-level controller | [CEER1 / low-level training](docs/ceer1.md) |
+| Train the compliant low-level controller | [CEER1 / compliance training](docs/ceer1.md) |
 | Add directional EE and root compliance | [CEER2 / high-level training & MoE](docs/ceer2.md) |
 | Control the robot interactively | [Keyboard teleoperation & scenes](docs/teleoperation.md) |
 | Evaluate stiffness or compare baselines | [Evaluation](docs/evaluation.md) |
@@ -65,5 +65,9 @@ For full training and evaluation, configure your W&B entity and checkpoint paths
 
 - **CEER (CEER1):** [Compliant End-Effector and Root Control as a Unified Interface for Hierarchical Humanoid Loco-Manipulation](https://arxiv.org/abs/2605.19981).
 - **CEER2:** [Directional and Tunable End-Effector and Root Compliance for Humanoid Loco-Manipulation](https://arxiv.org/abs/2609.38709).
+
+## Acknowledgments
+
+This codebase builds on [GentleHumanoid](https://github.com/Axellwppr/gentle-humanoid-training). We thank its authors for open-sourcing their implementation, which provided the starting point for CEER's low-level controller.
 
 Code: [MIT License](LICENSE). Motion datasets retain their original licenses. [Image source](docs/assets/README.md).

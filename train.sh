@@ -67,6 +67,9 @@ run_pipeline() {
 
 # The following low-level pipelines are the supported paper/public options:
 #
+#   PIPELINE=ceer1
+#     Compliant 3-kp controller with legacy anchor-force/admittance targets.
+#
 #   PIPELINE=stiff30
 #     Shared 3-kp stiff low-level policy with 30 N external-force probes.
 #
@@ -83,6 +86,10 @@ run_pipeline() {
 # the public repository has one low-level launcher without old one-off shell
 # wrappers scattered across the root directory.
 case "$PIPELINE" in
+  ceer1)
+    run_pipeline "G1/G1_3kp" "ceer1_3kp_compliant" \
+      "${RUN_TIMESTAMP}"
+    ;;
   stiff30)
     run_pipeline "G1/G1_3kp_stiff" "compliance_3kp_stiff" \
       "limmt_full_force30_${RUN_TIMESTAMP}"
@@ -100,7 +107,7 @@ case "$PIPELINE" in
     ;;
   *)
     echo "Unknown PIPELINE=$PIPELINE" >&2
-    echo "Choose: stiff30, fixed_ee, range_100_600, or 5kp" >&2
+    echo "Choose: ceer1, stiff30, fixed_ee, range_100_600, or 5kp" >&2
     exit 2
     ;;
 esac
